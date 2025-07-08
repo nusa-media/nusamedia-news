@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUSAMEDIA - Portal Berita Terkini</title>
+    <link rel="icon" type="image/x-icon" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Notification -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="notification-text">Berita berhasil dipublikasikan!</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <!-- Top Bar -->
+            <div class="flex justify-between items-center py-2 text-sm text-gray-600 border-b">
+                <div class="flex items-center space-x-4">
+                    <span id="current-date"></span>
+                    <span class="text-red-600">🔴 LIVE</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <i class="fab fa-facebook text-blue-600"></i>
+                    <i class="fab fa-tiktok text-black"></i>
+                    <i class="fab fa-instagram text-pink-600"></i>
+                    <i class="fab fa-youtube text-red-600"></i>
+                </div>
+            </div>
+            
+            <!-- Main Header -->
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <svg width="48" height="48" viewBox="0 0 48 48" class="mr-3">
+                            <img src="logo.png" width="48" height="48" margin="0px 10px">
+                        </svg>
+                    <h1 class="text-3xl font-bold text-red-600">NUSAMEDIA</h1>
+                    <span class="ml-2 text-sm text-gray-500">Portal Berita Terpercaya</span>
+                </div>
+                
+                <!-- Search Bar & Admin Controls -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden md:block">
+                        <input type="text" id="search-input" placeholder="Cari berita..." 
+                               class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 w-64">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <!-- Admin Controls -->
+                    <div id="admin-controls" class="hidden">
+                        <button onclick="openAddNewsModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span class="hidden md:inline">Tambah Berita</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Login/Logout Buttons -->
+                    <div id="login-controls">
+                        <button id="login-btn" onclick="openLoginModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            <span class="hidden md:inline">Login Admin</span>
+                        </button>
+                        <button id="logout-btn" onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 hidden">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            <span class="hidden md:inline">Logout</span>
+                        </button>
+                    </div>
+                    
+                    <button onclick="toggleDateFilter()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        <i class="fas fa-calendar"></i>
+                        <span class="hidden md:inline ml-2">Filter Tanggal</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Search -->
+            <div class="md:hidden pb-4">
+                <div class="relative">
+                    <input type="text" id="search-input-mobile" placeholder="Cari berita..." 
+                           class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 w-full">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="py-3 border-t">
+                <ul class="flex flex-wrap space-x-4 md:space-x-8 text-gray-700">
+                    <li><a href="#" onclick="filterByCategory('semua')" class="hover:text-red-600 font-medium category-filter active">Semua</a></li>
+                    <li><a href="#" onclick="filterByCategory('politik')" class="hover:text-red-600 category-filter">Politik</a></li>
+                    <li><a href="#" onclick="filterByCategory('ekonomi')" class="hover:text-red-600 category-filter">Ekonomi</a></li>
+                    <li><a href="#" onclick="filterByCategory('olahraga')" class="hover:text-red-600 category-filter">Olahraga</a></li>
+                    <li><a href="#" onclick="filterByCategory('teknologi')" class="hover:text-red-600 category-filter">Teknologi</a></li>
+                    <li><a href="#" onclick="filterByCategory('hiburan')" class="hover:text-red-600 category-filter">Hiburan</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Login Administrator</h3>
+                    <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Username:</label>
+                            <input type="text" id="username" required class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password:</label>
+                            <input type="password" id="password" required class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add News Modal -->
+    <div id="add-news-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold" id="modal-title">Tambah Berita Baru</h3>
+                    <button onclick="closeAddNewsModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleAddNews(event)" id="news-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Kategori *</label>
+                            <select id="news-category" required class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Pilih Kategori</option>
+                                <option value="politik">Politik</option>
+                                <option value="ekonomi">Ekonomi</option>
+                                <option value="olahraga">Olahraga</option>
+                                <option value="teknologi">Teknologi</option>
+                                <option value="hiburan">Hiburan</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Judul Berita *</label>
+                            <input type="text" id="news-title" required maxlength="100" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div class="text-xs text-gray-500 mt-1">
+                                <span id="title-counter">0</span>/100 karakter
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Ringkasan Berita *</label>
+                            <textarea id="news-summary" required maxlength="200" rows="3" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <span id="summary-counter">0</span>/200 karakter
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Gambar Berita</label>
+                            <div id="image-upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Klik untuk pilih gambar atau drag & drop</p>
+                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF hingga 10MB (bisa pilih beberapa gambar)</p>
+                                <input type="file" id="news-images" multiple accept="image/*" class="hidden">
+                            </div>
+                            
+                            <!-- Image Preview Grid -->
+                            <div id="image-preview-container" class="mt-4 hidden">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium">Gambar Dipilih: <span id="image-count">0</span></span>
+                                    <div class="space-x-2">
+                                        <button type="button" onclick="addMoreImages()" class="text-blue-600 hover:text-blue-800 text-sm">
+                                            <i class="fas fa-plus"></i> Tambah Lagi
+                                        </button>
+                                        <button type="button" onclick="clearAllImages()" class="text-red-600 hover:text-red-800 text-sm">
+                                            <i class="fas fa-trash"></i> Hapus Semua
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="image-preview-grid" class="grid grid-cols-3 gap-2"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Isi Berita *</label>
+                            <textarea id="news-content" required maxlength="2000" rows="8" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tulis isi berita lengkap di sini..."></textarea>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <span id="content-counter">0</span>/2000 karakter
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2 pt-4">
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex-1">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                <span id="submit-btn-text">Publikasikan Berita</span>
+                            </button>
+                            <button type="button" onclick="closeAddNewsModal()" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400">
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Detail Modal -->
+    <div id="news-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg w-full max-w-4xl max-h-screen overflow-y-auto">
+                <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">Detail Berita</h3>
+                    <button onclick="closeNewsDetail()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="news-detail-content" class="p-6">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Filter Modal -->
+    <div id="date-filter-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Filter Berdasarkan Tanggal</h3>
+                    <button onclick="toggleDateFilter()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Dari Tanggal:</label>
+                        <input type="date" id="date-from" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Sampai Tanggal:</label>
+                        <input type="date" id="date-to" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="filterByDate()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex-1">
+                            Terapkan Filter
+                        </button>
+                        <button onclick="clearDateFilter()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 flex-1">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+                    <h3 class="text-lg font-semibold mb-2">Konfirmasi Hapus</h3>
+                    <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus berita ini? Tindakan ini tidak dapat dibatalkan.</p>
+                    <div class="flex space-x-2">
+                        <button onclick="confirmDelete()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex-1">
+                            Ya, Hapus
+                        </button>
+                        <button onclick="closeDeleteModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 flex-1">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Time Filter Buttons -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="filterByTime('all')" class="time-filter active bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                Semua Berita
+            </button>
+            <button onclick="filterByTime('today')" class="time-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                Hari Ini
+            </button>
+            <button onclick="filterByTime('yesterday')" class="time-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                1 Hari Lalu
+            </button>
+            <button onclick="filterByTime('week')" class="time-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                7 Hari Lalu
+            </button>
+            <button onclick="filterByTime('month')" class="time-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                1 Bulan Lalu
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Main News Section -->
+            <div class="lg:col-span-3">
+
+
+                <!-- Latest News -->
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">Berita Terkini</h2>
+                    <div id="latest-news">
+                        <!-- Latest news will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Load More Button -->
+                <div class="text-center mt-8">
+                    <button onclick="loadMoreNews()" class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 font-medium">
+                        Muat Lebih Banyak
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Popular News -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">Berita Populer</h3>
+                    <div class="space-y-4" id="popular-news">
+                        <!-- Popular news will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">Kategori</h3>
+                    <div class="space-y-2">
+                        <a href="#" onclick="filterByCategory('politik')" class="block text-gray-600 hover:text-red-600 py-1">
+                            <i class="fas fa-chevron-right text-xs mr-2"></i>Politik
+                        </a>
+                        <a href="#" onclick="filterByCategory('ekonomi')" class="block text-gray-600 hover:text-red-600 py-1">
+                            <i class="fas fa-chevron-right text-xs mr-2"></i>Ekonomi
+                        </a>
+                        <a href="#" onclick="filterByCategory('olahraga')" class="block text-gray-600 hover:text-red-600 py-1">
+                            <i class="fas fa-chevron-right text-xs mr-2"></i>Olahraga
+                        </a>
+                        <a href="#" onclick="filterByCategory('teknologi')" class="block text-gray-600 hover:text-red-600 py-1">
+                            <i class="fas fa-chevron-right text-xs mr-2"></i>Teknologi
+                        </a>
+                        <a href="#" onclick="filterByCategory('hiburan')" class="block text-gray-600 hover:text-red-600 py-1">
+                            <i class="fas fa-chevron-right text-xs mr-2"></i>Hiburan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">NUSAMEDIA</h3>
+                    <p class="text-gray-300">Portal berita terpercaya yang menyajikan informasi terkini dan akurat untuk masyarakat Indonesia.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Kategori</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white">Politik</a></li>
+                        <li><a href="#" class="hover:text-white">Ekonomi</a></li>
+                        <li><a href="#" class="hover:text-white">Olahraga</a></li>
+                        <li><a href="#" class="hover:text-white">Teknologi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Tentang Kami</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white">Redaksi</a></li>
+                        <li><a href="#" class="hover:text-white">Kontak</a></li>
+                        <li><a href="#" class="hover:text-white">Karir</a></li>
+                        <li><a href="#" class="hover:text-white">Kebijakan Privasi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Ikuti Kami</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://web.facebook.com/profile.php?id=61576225011346" class="text-2xl hover:text-blue-400"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.tiktok.com/@nusamedianews" class="text-2xl hover:text-cyan-400"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://www.instagram.com/nusamedianews?utm_source=ig_web_button_share_sheet&igsh=MXE0Ymd2cGc2N2dhdg==" class="text-2xl hover:text-pink-400"><i class="fab fa-instagram"></i></a>
+                        <a href="http://www.youtube.com/@nusamedia_official" class="text-2xl hover:text-red-400"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-300">
+                <p>&copy; 2024 NUSAMEDIA. Semua hak cipta dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95b8c3e74189e794',t:'MTc1MTkwNjIzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
